@@ -1,15 +1,17 @@
+const fs = require('fs');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
 const { clientId, guildId, token } = require('./config.json');
 
-const commands = [
-	new SlashCommandBuilder().setName('noodle').setDescription('whatever bruh'),
-	new SlashCommandBuilder().setName('server').setDescription('Replies with server info!'),
-	new SlashCommandBuilder().setName('user').setDescription('Replies with user info!'),
-    new SlashCommandBuilder().setName('f1').setDescription('Call the boys to fumar 1 meu chegado')
-]
-	.map(command => command.toJSON());
+const commands = [];
+const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+
+for(const file of commandFiles){
+	const command = require(`./commands/${file}`);
+	commands.push(command.data.toJSON());
+}
+//	.map(command => command.toJSON());
 
 const rest = new REST({ version: '9' }).setToken(token);
 
@@ -24,4 +26,4 @@ const rest = new REST({ version: '9' }).setToken(token);
 	} catch (error) {
 		console.error(error);
 	}
-})()
+})();
